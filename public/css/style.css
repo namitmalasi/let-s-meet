@@ -40,6 +40,13 @@ body {
   align-items: center;
 }
 
+header {
+  margin: 0 auto;
+  font-size: 26px;
+  font-weight: 520;
+  padding: 10px;
+}
+
 .dashboard_container {
   width: 25%;
   height: 100%;
