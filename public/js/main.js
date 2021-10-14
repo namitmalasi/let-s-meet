@@ -1,6 +1,4 @@
-const socket = io("/");
+import * as wss from "./wss.js";
 
-socket.on("connect", () => {
-  console.log("Successfully connected to socket.io server");
-  console.log(socket.id);
-});
+const socket = io("/");
+wss.registerSocketEvents(socket);
