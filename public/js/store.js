@@ -44,7 +44,7 @@ export const setScreenSharingStream = (stream) => {
 };
 
 export const setRemoteStream = (stream) => {
-  tate = {
+  state = {
     ...state,
     remoteStream: stream,
   };
