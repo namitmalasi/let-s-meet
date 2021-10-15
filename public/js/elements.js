@@ -55,6 +55,48 @@ export const getIncomingCallDialog = (
   dialogContent.appendChild(imageContainer);
   dialogContent.appendChild(buttonContainer);
 
-  const dialogHTML = document.getElementById("dialog");
-  dialogHTML.appendChild(dialog);
+  return dialog;
+};
+
+export const getCallingDialog = (rejectCallHandler) => {
+  //creating the dialog box container
+
+  const dialog = document.createElement("div");
+  dialog.classList.add("dialog_wrapper");
+  const dialogContent = document.createElement("div");
+  dialogContent.classList.add("dialog_content");
+  dialog.appendChild(dialogContent);
+
+  //  Dialog box Title
+  const title = document.createElement("p");
+  title.classList.add("dialog_title");
+  title.innerHTML = `Calling`;
+
+  // Dialog image imageContainer
+
+  const imageContainer = document.createElement("div");
+  imageContainer.classList.add("dialog_image_container");
+  const image = document.createElement("img");
+  const avatarImagePath = "./utils/images/dialogAvatar.png";
+  image.src = avatarImagePath;
+  imageContainer.appendChild(image);
+
+  // Dialog Button container
+  const buttonContainer = document.createElement("div");
+  buttonContainer.classList.add("dialog_button_container");
+
+  const hangUpCallButton = document.createElement("button");
+  hangUpCallButton.classList.add("dialog_reject_call_button");
+  const hangUpCallImg = document.createElement("img");
+  hangUpCallImg.classList.add("dialog_button_image");
+  const hangUpCallImgPath = "./utils/images/rejectCall.png";
+  hangUpCallImg.src = hangUpCallImgPath;
+  hangUpCallButton.append(hangUpCallImg);
+  buttonContainer.appendChild(hangUpCallButton);
+
+  dialogContent.appendChild(title);
+  dialogContent.appendChild(imageContainer);
+  dialogContent.appendChild(buttonContainer);
+
+  return dialog;
 };
