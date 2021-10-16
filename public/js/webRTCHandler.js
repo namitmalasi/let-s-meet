@@ -4,10 +4,17 @@ import * as ui from "./ui.js";
 import * as store from "./store.js";
 
 let connectedUserDetails;
-
+let peerConnection;
 const defaultConstraints = {
   audio: true,
   video: true,
+};
+const configuration = {
+  iceServers: [
+    {
+      urls: "stun:stun.l.google.com:13902",
+    },
+  ],
 };
 
 export const getLocalPreview = () => {
@@ -21,6 +28,43 @@ export const getLocalPreview = () => {
       console.log("error occured when trying to get access to camera");
       console.log(err);
     });
+};
+
+const createPeerConnection = () => {
+  peerConnection = new RTCPeerConnection(configuration);
+
+  peerConnection.onicecandidate = (event) => {
+    console.log("getting ice candidates from stun server");
+    if (event.candidate) {
+      // send our ice candidate to other peer
+    }
+  };
+
+  peerConnection.onconnectionstatechange = (event) => {
+    if (peerConnection.connectionState === "connected") {
+      console.log("successfully connected with other peer");
+    }
+  };
+
+  // receiving tracks
+  const remoteStream = new MediaStream();
+  store.setRemoteStream(remoteStream);
+  ui.updateRemoteVideo(remoteStream);
+
+  peerConnection.onTrack = (event) => {
+    remoteStream.addTrack(event.track);
+  };
+
+  // add our stream to peer connection
+  if (
+    connectedUserDetails.callType === constants.callType.VIDEO_PERSONAL_CODE
+  ) {
+    const localStream = store.getState().localStream;
+
+    for (const track of localStream.getTracks()) {
+      peerConnection.addTrack(track, localStream);
+    }
+  }
 };
 export const sendPreOffer = (callType, calleePersonalCode) => {
   connectedUserDetails = {
@@ -59,6 +103,7 @@ export const handlePreOffer = (data) => {
 
 const acceptCallHandler = () => {
   console.log("call accepted");
+  createPeerConnection();
   sendPreOfferAnswer(constants.preOfferAnswer.CALL_ACCEPTED);
   ui.showCallElements(connectedUserDetails.callType);
 };
@@ -98,6 +143,34 @@ export const handlePreOfferAnswer = (data) => {
   }
   if (preOfferAnswer === constants.preOfferAnswer.CALL_ACCEPTED) {
     ui.showCallElements(connectedUserDetails.callType);
+    createPeerConnection();
+    sendWebRTCOffer();
     // send webRTC offer
   }
+};
+
+export const sendWebRTCOffer = async () => {
+  const offer = await peerConnection.createOffer();
+  await peerConnection.setLocalDescription(offer);
+  wss.sendDataUsingWebRTCSignaling({
+    connectedUserSocketId: connectedUserDetails.socketId,
+    type: constants.WebRTCSignaling.OFFER,
+    offer: offer,
+  });
+};
+
+export const handleWebRTCOffer = async (data) => {
+  await peerConnection.setRemoteDescription(data.offer);
+  const answer = await peerConnection.createAnswer();
+  await peerConnection.setLocalDescription(answer);
+  wss.sendDataUsingWebRTCSignaling({
+    connectedUserSocketId: connectedUserDetails.socketId,
+    type: constants.WebRTCSignaling.ANSWER,
+    answer: answer,
+  });
+};
+
+export const handleWebRTCAnswer = async (data) => {
+  console.log("handling webRTC answer");
+  await peerConnection.setRemoteDescription(data.answer);
 };

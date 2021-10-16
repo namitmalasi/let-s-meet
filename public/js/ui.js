@@ -17,6 +17,11 @@ export const updateLocalVideo = (stream) => {
     localVideo.play();
   });
 };
+
+export const updateRemoteVideo = (stream) => {
+  const remoteVideo = document.getElementById("remote_video");
+  remoteVideo.srcObject = stream;
+};
 export const showIncomingCallDialog = (
   callType,
   acceptCallHandler,
@@ -125,14 +130,14 @@ const showVideoCallElements = () => {
 };
 // ui helper function
 const enableDashboard = () => {
-  const dashBoardBlocker = document.getElementById("dashboard-blur");
+  const dashBoardBlocker = document.getElementById("dashboard_blur");
   if (!dashBoardBlocker.classList.contains("display_none")) {
     dashBoardBlocker.classList.add("display_none");
   }
 };
 
 const disableDashboard = () => {
-  const dashBoardBlocker = document.getElementById("dashboard-blur");
+  const dashBoardBlocker = document.getElementById("dashboard_blur");
   if (dashBoardBlocker.classList.contains("display_none")) {
     dashBoardBlocker.classList.remove("display_none");
   }

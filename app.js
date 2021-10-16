@@ -51,6 +51,17 @@ io.on("connection", (socket) => {
       io.to(data.callerSocketId).emit("pre-offer-answer", data);
     }
   });
+
+  socket.on("WebRTC-Signaling", (data) => {
+    const { connectedUserSocketId } = data;
+
+    const connectedPeer = connectedPeers.find(
+      (peerSocketId) => peerSocketId === connectedUserSocketId
+    );
+    if (connectedPeer) {
+      io.to(connectedUserSocketId).emit("WebRTC-Signaling", data);
+    }
+  });
   socket.on("disconnect", () => {
     console.log("user disconnected");
 
